@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamersHub - Comunidad & Streams</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        twitch: {
+                            400: '#a970ff',
+                            500: '#9146FF',
+                            600: '#772CE8',
+                            700: '#5c19b8',
+                        },
+                        discord: {
+                            dark: '#313338',
+                            darker: '#1e1f22',
+                            sidebar: '#2b2d31',
+                            accent: '#5865F2',
+                            hover: '#35373c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for immersive chat & lists */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1f22;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #35373c;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5865F2;
+        }
+    </style>
+</head>
+<body class="bg-discord-darker text-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-discord-dark border-b border-gray-800 h-16 flex items-center justify-between px-4 lg:px-6 z-20 shrink-0">
+        <!-- Logo & Brand -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('community')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-twitch-500 to-discord-accent flex items-center justify-center shadow-lg shadow-twitch-500/30">
+                <i class="fa-solid fa-gamepad text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-lg tracking-wide bg-gradient-to-r from-twitch-500 via-purple-400 to-discord-accent bg-clip-text text-transparent">StreamersHub</h1>
+                <span class="text-xs text-gray-400 font-medium">Comunidad Global GG</span>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex space-x-1 bg-discord-darker p-1 rounded-xl border border-gray-800">
+            <button onclick="switchTab('community')" id="nav-community" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-twitch-600 text-white shadow-md">
+                <i class="fa-solid fa-comments mr-2"></i>Comunidad
+            </button>
+            <button onclick="switchTab('channels')" id="nav-channels" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-discord-hover transition-all duration-200">
+                <i class="fa-solid fa-hashtag mr-2"></i>Canales de Juegos
+            </button>
+            <button onclick="switchTab('events')" id="nav-events" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-discord-hover transition-all duration-200">
+                <i class="fa-solid fa-calendar-days mr-2"></i>Eventos & Torneos
+            </button>
+            <button onclick="switchTab('clips')" id="nav-clips" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-discord-hover transition-all duration-200">
+                <i class="fa-solid fa-clapperboard mr-2"></i>Clips Destacados
+            </button>
+        </nav>
+
+        <!-- Right Side: User Profile & Quick Actions -->
+        <div class="flex items-center space-x-3">
+            <button onclick="openNewPostModal()" class="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-twitch-600 to-discord-accent hover:opacity-95 text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition-all shadow-md shadow-discord-accent/25 active:scale-95">
+                <i class="fa-solid fa-plus"></i>
+                <span>Nuevo Hilo</span>
+            </button>
+            <div class="relative flex items-center space-x-2 bg-discord-darker px-3 py-1.5 rounded-xl border border-gray-800">
+                <div class="w-8 h-8 rounded-lg bg-twitch-600 flex items-center justify-center font-bold text-white shadow">V</div>
+                <div class="hidden sm:block text-left pr-2">
+                    <p class="text-xs font-bold leading-tight">ValkyStream</p>
+                    <span class="text-[10px] text-emerald-400 font-medium flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1 animate-pulse"></span>En Directo</span>
+                </div>
+            </div>
+            <!-- Mobile Menu Toggle Button -->
+            <button onclick="toggleMobileMenu()" id="mobile-toggle-btn" class="md:hidden text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Drawer Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-discord-dark border-b border-gray-800 px-4 py-3 space-y-2 z-30">
+        <button onclick="switchTab('community'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-200 hover:bg-discord-hover flex items-center"><i class="fa-solid fa-comments w-6 text-twitch-500"></i> Comunidad</button>
+        <button onclick="switchTab('channels'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-200 hover:bg-discord-hover flex items-center"><i class="fa-solid fa-hashtag w-6 text-twitch-500"></i> Canales de Juegos</button>
+        <button onclick="switchTab('events'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-200 hover:bg-discord-hover flex items-center"><i class="fa-solid fa-calendar-days w-6 text-twitch-500"></i> Eventos & Torneos</button>
+        <button onclick="switchTab('clips'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-200 hover:bg-discord-hover flex items-center"><i class="fa-solid fa-clapperboard w-6 text-twitch-500"></i> Clips Destacados</button>
+        <button onclick="openNewPostModal(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-twitch-400 hover:bg-discord-hover flex items-center"><i class="fa-solid fa-plus w-6"></i> Crear Nuevo Hilo</button>
+    </div>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <!-------------------------------- TAB 1: COMUNIDAD (Foros, Debates y Publicaciones) -------------------------------->
+        <div id="tab-community" class="tab-content flex-1 flex flex-col md:flex-row overflow-hidden">
+            <!-- Left Sidebar: Categorías & Canales rápidos -->
+            <aside class="w-full md:w-64 bg-discord-sidebar border-r border-gray-800 flex flex-col shrink-0 overflow-y-auto">
+                <div class="p-4 border-b border-gray-800/60">
+                    <h2 class="text-xs uppercase font-bold text-gray-400 tracking-wider mb-3">Catálogos Populares</h2>
+                    <div class="space-y-1" id="game-catalogs-list">
+                        <button onclick="filterCatalog('all')" id="catalog-btn-all" class="catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium bg-twitch-600/20 text-twitch-400 border border-twitch-500/30 transition">
+                            <span class="flex items-center"><i class="fa-solid fa-fire mr-2"></i> Todos los Juegos</span>
+                            <span class="text-xs bg-twitch-500/20 px-2 py-0.5 rounded-full" id="catalog-count-all">24</span>
+                        </button>
+                        <button onclick="filterCatalog('Valorant')" id="catalog-btn-valorant" class="catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-discord-hover transition">
+                            <span class="flex items-center"><i class="fa-solid fa-shield-halved mr-2 text-rose-500"></i> Valorant</span>
+                            <span class="text-xs text-gray-500">8</span>
+                        </button>
+                        <button onclick="filterCatalog('Minecraft')" id="catalog-btn-minecraft" class="catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-discord-hover transition">
+                            <span class="flex items-center"><i class="fa-solid fa-cube mr-2 text-emerald-500"></i> Minecraft</span>
+                            <span class="text-xs text-gray-500">6</span>
+                        </button>
+                        <button onclick="filterCatalog('League of Legends')" id="catalog-btn-lol" class="catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-discord-hover transition">
+                            <span class="flex items-center"><i class="fa-solid fa-bolt mr-2 text-blue-400"></i> LoL</span>
+                            <span class="text-xs text-gray-500">10</span>
+                        </button>
+                        <button onclick="filterCatalog('Helldivers 2')" id="catalog-btn-helldivers" class="catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-discord-hover transition">
+                            <span class="flex items-center"><i class="fa-solid fa-skull mr-2 text-amber-500"></i> Helldivers 2</span>
+                            <span class="text-xs text-gray-500">4</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4 flex-1">
+                    <h2 class="text-xs uppercase font-bold text-gray-400 tracking-wider mb-3">Streamers Online</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-discord-hover cursor-pointer transition" onclick="switchChatChannel('valorant', 'Estrategias y Clips de Valorant')">
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">A</div>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-discord-sidebar rounded-full"></span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold leading-tight text-gray-200">AlexProGamer</p>
+                                    <span class="text-[11px] text-gray-400 truncate w-32 inline-block">Jugando Valorant</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-discord-hover cursor-pointer transition" onclick="switchChatChannel('general', 'Chat General de la Comunidad')">
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white">K</div>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-discord-sidebar rounded-full"></span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold leading-tight text-gray-200">KitsuneChan</p>
+                                    <span class="text-[11px] text-gray-400 truncate w-32 inline-block">Construyendo castillo</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-discord-hover cursor-pointer transition" onclick="switchChatChannel('lol', 'Grieta del Invocador - LoL')">
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-xs font-bold text-white">N</div>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-discord-sidebar rounded-full"></span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold leading-tight text-gray-200">NexuzGamer</p>
+                                    <span class="text-[11px] text-gray-400 truncate w-32 inline-block">Climbing Challenger</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Feed Area -->
+            <div class="flex-1 flex flex-col bg-discord-dark overflow-y-auto p-4 lg:p-6">
+                <!-- Header Banner / Search & Filters -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-800">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center">
+                            <i class="fa-solid fa-comments text-twitch-500 mr-2.5"></i> Debates y Publicaciones de la Comunidad
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-0.5">Comparte estrategias, memes o busca compañeros para tus partidas.</p>
+                    </div>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-64">
+                            <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500 text-sm"></i>
+                            <input type="text" id="search-posts" oninput="filterPosts()" placeholder="Buscar hilos..." class="w-full bg-discord-darker text-sm text-gray-200 pl-9 pr-4 py-2 rounded-xl border border-gray-700 focus:outline-none focus:border-twitch-500 transition">
+                        </div>
+                        <button onclick="openNewPostModal()" class="sm:hidden bg-twitch-600 hover:bg-twitch-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posts List Container -->
+                <div id="posts-container" class="space-y-4 max-w-4xl mx-auto w-full pb-12">
+                    <!-- Dynamic Posts Rendered Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-------------------------------- TAB 2: CANALES DE JUEGOS (Chat en Vivo por Salas) -------------------------------->
+        <div id="tab-channels" class="tab-content hidden flex-1 flex overflow-hidden">
+            <!-- Channel List Sidebar -->
+            <div class="w-72 bg-discord-sidebar border-r border-gray-800 flex flex-col shrink-0">
+                <div class="p-4 border-b border-gray-800/60 font-bold text-sm tracking-wide text-gray-300 flex justify-between items-center">
+                    <span>CANALES DE CHAT</span>
+                    <i class="fa-solid fa-hashtag text-gray-500"></i>
+                </div>
+                <div class="p-2 space-y-1 overflow-y-auto flex-1">
+                    <button onclick="switchChatChannel('general', 'Chat General de la Comunidad')" id="channel-btn-general" class="chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium bg-discord-hover text-white flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-hashtag text-gray-400"></i>
+                        <span>general-comunidad</span>
+                    </button>
+                    <button onclick="switchChatChannel('valorant', 'Estrategias y Clips de Valorant')" id="channel-btn-valorant" class="chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-discord-hover hover:text-white flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-hashtag text-rose-500"></i>
+                        <span>valorant-tactics</span>
+                    </button>
+                    <button onclick="switchChatChannel('lol', 'Grieta del Invocador - LoL')" id="channel-btn-lol" class="chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-discord-hover hover:text-white flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-hashtag text-blue-400"></i>
+                        <span>lol-duos</span>
+                    </button>
+                    <button onclick="switchChatChannel('streamers', 'Consejos para Creadores & Setup')" id="channel-btn-streamers" class="chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-discord-hover hover:text-white flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-hashtag text-twitch-500"></i>
+                        <span>tips-streamers</span>
+                    </button>
+                    <button onclick="switchChatChannel('memes', 'Memes & Anécdotas de Directo')" id="channel-btn-memes" class="chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-discord-hover hover:text-white flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-hashtag text-amber-500"></i>
+                        <span>memes-gaming</span>
+                    </button>
+                </div>
+                <!-- Voice / Quick Panel footer -->
+                <div class="p-3 bg-discord-darker border-t border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i class="fa-solid fa-microphone text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-200" id="voice-status-title">Sala de Voz Activa</p>
+                            <span class="text-[10px] text-gray-400" id="voice-members-count">4 miembros conectados</span>
+                        </div>
+                    </div>
+                    <button id="voice-toggle-btn" onclick="toggleVoiceConnection()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-xs px-2.5 py-1.5 rounded-lg font-semibold transition">Desconectar</button>
+                </div>
+            </div>
+
+            <!-- Active Chat Area -->
+            <div class="flex-1 flex flex-col bg-discord-dark">
+                <!-- Chat Top Header -->
+                <div class="h-14 border-b border-gray-800 flex items-center justify-between px-6 bg-discord-dark shadow-sm shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-hashtag text-twitch-500 text-lg"></i>
+                        <div>
+                            <h3 id="current-chat-title" class="font-bold text-sm text-white">Chat General de la Comunidad</h3>
+                            <p id="current-chat-desc" class="text-xs text-gray-400">Habla de cualquier videojuego con la comunidad</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 text-gray-400">
+                        <button title="Notificaciones" class="hover:text-white transition p-1"><i class="fa-solid fa-bell text-sm"></i></button>
+                        <button title="Miembros Online" onclick="alert('Miembros activos en la sala: 142')" class="hover:text-white transition p-1"><i class="fa-solid fa-users text-sm"></i></button>
+                    </div>
+                </div>
+
+                <!-- Messages Scroll Area -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
+                    <!-- Rendered via JS -->
+                </div>
+
+                <!-- Chat Input Bar -->
+                <div class="p-4 bg-discord-dark border-t border-gray-800 shrink-0">
+                    <form onsubmit="handleChatSubmit(event)" class="relative flex items-center">
+                        <button type="button" onclick="insertEmoji('🔥')" class="absolute left-3.5 text-gray-400 hover:text-white transition" title="Añadir Emoji">
+                            <i class="fa-solid fa-face-smile"></i>
+                        </button>
+                        <input type="text" id="chat-input" placeholder="Enviar mensaje a #general-comunidad..." class="w-full bg-discord-darker text-sm text-gray-200 pl-11 pr-24 py-3 rounded-xl border border-gray-700/80 focus:outline-none focus:border-twitch-500 transition">
+                        <button type="submit" class="absolute right-2.5 bg-twitch-600 hover:bg-twitch-700 text-white text-xs px-4 py-2 rounded-lg font-bold transition flex items-center space-x-1.5 shadow-md">
+                            <span>Enviar</span>
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-------------------------------- TAB 3: EVENTOS & TORNEOS -------------------------------->
+        <div id="tab-events" class="tab-content hidden flex-1 flex flex-col bg-discord-dark overflow-y-auto p-4 lg:p-8">
+            <div class="max-w-6xl mx-auto w-full">
+                <!-- Header Banner -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-800">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-trophy"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-2xl font-black text-white tracking-wide">Torneos & Eventos Oficiales</h2>
+                                <p class="text-sm text-gray-400">Compite con tu escuadrón, gana premios en efectivo y gana visibilidad para tu canal.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="filterEvents('all')" id="event-filter-all" class="event-filter px-3.5 py-1.5 rounded-lg text-xs font-bold bg-twitch-600 text-white">Todos</button>
+                        <button onclick="filterEvents('live')" id="event-filter-live" class="event-filter px-3.5 py-1.5 rounded-lg text-xs font-bold bg-discord-sidebar hover:bg-discord-hover text-gray-300">En Vivo</button>
+                        <button onclick="filterEvents('upcoming')" id="event-filter-upcoming" class="event-filter px-3.5 py-1.5 rounded-lg text-xs font-bold bg-discord-sidebar hover:bg-discord-hover text-gray-300">Próximos</button>
+                    </div>
+                </div>
+
+                <!-- Events Grid -->
+                <div id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
+                    <!-- Event Cards dynamically generated -->
+                </div>
+            </div>
+        </div>
+
+        <!-------------------------------- TAB 4: CLIPS DESTACADOS -------------------------------->
+        <div id="tab-clips" class="tab-content hidden flex-1 flex flex-col bg-discord-dark overflow-y-auto p-4 lg:p-8">
+            <div class="max-w-6xl mx-auto w-full">
+                <!-- Clips Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-800">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-10 h-10 rounded-xl bg-twitch-500/20 text-twitch-400 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-clapperboard"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-2xl font-black text-white tracking-wide">Momentos y Clips Destacados</h2>
+                                <p class="text-sm text-gray-400">Las mejores jugadas, fails y momentos legendarios de los streamers de la comunidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="openShareClipModal()" class="bg-twitch-600 hover:bg-twitch-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center space-x-2 shadow-lg transition">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Compartir Clip</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clips Grid -->
+                <div id="clips-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
+                    <!-- Dynamic clips cards -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-------------------------------- MODAL: NUEVO HILO / PUBLICACIÓN -------------------------------->
+    <div id="new-post-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-discord-dark border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-800 mb-4">
+                <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fa-solid fa-feather-pointed text-twitch-500 mr-2"></i> Crear Nuevo Hilo en la Comunidad
+                </h3>
+                <button onclick="closeNewPostModal()" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form onsubmit="handleNewPostSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Título del Hilo</label>
+                    <input type="text" id="post-title" required placeholder="Ej: ¿Cuál es el mejor agente iniciador en Bind?" class="w-full bg-discord-darker text-sm text-gray-100 px-3.5 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-twitch-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Juego / Categoría</label>
+                    <select id="post-game" class="w-full bg-discord-darker text-sm text-gray-100 px-3.5 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-twitch-500 transition">
+                        <option value="Valorant">Valorant</option>
+                        <option value="Minecraft">Minecraft</option>
+                        <option value="League of Legends">League of Legends</option>
+                        <option value="Helldivers 2">Helldivers 2</option>
+                        <option value="General">Charlas & Varios</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Contenido / Debate</label>
+                    <textarea id="post-content" rows="4" required placeholder="Escribe tu consulta, guía o anécdota aquí..." class="w-full bg-discord-darker text-sm text-gray-100 p-3.5 rounded-xl border border-gray-700 focus:outline-none focus:border-twitch-500 transition"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Tags (separados por coma)</label>
+                    <input type="text" id="post-tags" placeholder="estrategia, meta, ranked" class="w-full bg-discord-darker text-sm text-gray-100 px-3.5 py-2 rounded-xl border border-gray-700 focus:outline-none focus:border-twitch-500 transition">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeNewPostModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-400 hover:text-white transition">Cancelar</button>
+                    <button type="submit" class="bg-gradient-to-r from-twitch-600 to-discord-accent hover:opacity-95 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md transition">Publicar Hilo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-------------------------------- MODAL: REPRODUCTOR DE CLIP -------------------------------->
+    <div id="clip-player-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-discord-dark border border-gray-700 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden relative">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-twitch-600 flex items-center justify-center text-white text-xs font-bold" id="modal-clip-avatar">V</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white" id="modal-clip-title">Título del Clip</h4>
+                        <p class="text-xs text-gray-400" id="modal-clip-author">por Streamer</p>
+                    </div>
+                </div>
+                <button onclick="closeClipPlayerModal()" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Video Simulation Container -->
+            <div class="relative bg-black aspect-video flex items-center justify-center group">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10 pointer-events-none"></div>
+                <div id="clip-video-display" class="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-gradient-to-br from-purple-950/40 via-discord-darker to-indigo-950/40">
+                    <div class="w-20 h-20 rounded-full bg-twitch-600/90 hover:bg-twitch-500 text-white flex items-center justify-center text-3xl shadow-xl cursor-pointer transition transform hover:scale-110 mb-4" onclick="toggleClipPlayAnimation()">
+                        <i class="fa-solid fa-play ml-1" id="modal-play-icon"></i>
+                    </div>
+                    <p class="text-sm font-medium text-purple-200" id="modal-clip-subtitle">Reproducción de clip simulada en alta definición (1080p60)</p>
+                    <span class="text-xs text-gray-400 mt-1">Sonido habilitado • 60 FPS</span>
+                </div>
+                <!-- Video Controls Mock -->
+                <div class="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between text-xs text-gray-300">
+                    <div class="flex items-center space-x-3">
+                        <button onclick="toggleClipPlayAnimation()"><i class="fa-solid fa-pause hover:text-white"></i></button>
+                        <span>0:14 / 0:30</span>
+                        <div class="w-32 sm:w-64 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <div class="w-1/2 h-full bg-twitch-500"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button><i class="fa-solid fa-volume-high hover:text-white"></i></button>
+                        <button><i class="fa-solid fa-expand hover:text-white"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-discord-darker flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-gray-400 flex items-center"><i class="fa-solid fa-eye mr-1.5 text-gray-500"></i> <span id="modal-clip-views">12.4k</span> vistas</span>
+                    <span class="text-xs text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full font-medium" id="modal-clip-game">Valorant</span>
+                </div>
+                <button onclick="likeCurrentModalClip()" id="modal-clip-like-btn" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="modal-clip-likes-text">Me gusta (148)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-------------------------------- JAVASCRIPT APPLICATION LOGIC -------------------------------->
+    <script>
+        // State Management
+        const state = {
+            activeTab: 'community',
+            activeCatalog: 'all',
+            activeChannel: 'general',
+            voiceConnected: true,
+            posts: [
+                {
+                    id: 1,
+                    author: 'ViperMain23',
+                    avatarLetter: 'V',
+                    avatarBg: 'bg-emerald-600',
+                    game: 'Valorant',
+                    title: 'Lineups de veneno imprescindibles para Bind post-patch',
+                    content: 'He estado testeando las nuevas modificaciones en Bind tras el último parche 8.04. Estas 3 rutas de humo aseguran el plantado en A sin exponerse a la zona de Lámparas. ¿Alguien más siente que el cambio de tiempos benefició a los controladores?',
+                    tags: ['estrategia', 'lineups', 'guía'],
+                    likes: 42,
+                    liked: false,
+                    replies: 15,
+                    time: 'Hace 25 min'
+                },
+                {
+                    id: 2,
+                    author: 'CrafterLegend',
+                    avatarLetter: 'C',
+                    avatarBg: 'bg-amber-600',
+                    game: 'Minecraft',
+                    title: 'Servidor SMP Survival Técnico: Apertura de inscripciones Season 4',
+                    content: '¡Iniciamos el reclutamiento para el server técnico con granjas automáticas y mods de optimización! Buscamos constructores y jugadores dedicados a redstone. Transmitiremos los domingos de eventos.',
+                    tags: ['smp', 'redstone', 'streamers'],
+                    likes: 29,
+                    liked: false,
+                    replies: 8,
+                    time: 'Hace 1 hora'
+                },
+                {
+                    id: 3,
+                    author: 'FakerFanboy',
+                    avatarLetter: 'F',
+                    avatarBg: 'bg-blue-600',
+                    game: 'League of Legends',
+                    title: 'Debate: ¿Cuál es el pick comodín más consistente en Mid?',
+                    content: 'Con el estado actual de los objetos de daño mágico, campeones como Orianna y Syndra parecen dominantes, pero Ahri sigue teniendo una versatilidad brutal en SoloQ. ¿Qué campeones os dan más confianza en promo?',
+                    tags: ['midlane', 'soloq', 'meta'],
+                    likes: 56,
+                    liked: false,
+                    replies: 34,
+                    time: 'Hace 3 horas'
+                },
+                {
+                    id: 4,
+                    author: 'SuperEarthTrooper',
+                    avatarLetter: 'S',
+                    avatarBg: 'bg-yellow-600',
+                    game: 'Helldivers 2',
+                    title: 'Estrategia contra la ofensiva Autómata en nivel Helldive',
+                    content: 'Para erradicar las naves nodrizas rápidamente recomendamos alternar ataques de Railcannon orbital con torretas de mortero electromagnéticas. No olviden la armadura pesada contra fuego de misiles.',
+                    tags: ['coop', 'helldivers', 'tacticas'],
+                    likes: 19,
+                    liked: false,
+                    replies: 5,
+                    time: 'Hace 4 horas'
+                }
+            ],
+            chatMessages: {
+                general: [
+                    { id: 1, user: 'AlexProGamer', badge: 'Streamer', color: 'text-indigo-400', time: '18:40', text: '¡Buenas tardes a todos! ¿Alguien listo para unas partidas luego?' },
+                    { id: 2, user: 'KitsuneChan', badge: 'VIP', color: 'text-pink-400', time: '18:41', text: '¡Hola Alex! En 30 minutos prendo directo de construcción tranquila en Minecraft 🎮' },
+                    { id: 3, user: 'GamerZero', badge: 'Mod', color: 'text-emerald-400', time: '18:43', text: 'Recuerden que hoy a las 20:00 empieza el torneo de Valorant de la comunidad.' },
+                    { id: 4, user: 'ValkyStream', badge: 'Streamer', color: 'text-twitch-400', time: '18:45', text: '¡Yo ya tengo mi squad anotado, suerte a todos en el bracket!' }
+                ],
+                valorant: [
+                    { id: 1, user: 'AlexProGamer', badge: 'Streamer', color: 'text-indigo-400', time: '17:20', text: '¿Quién está probando el nuevo parche en ranked?' },
+                    { id: 2, user: 'ViperMain23', badge: 'Miembro', color: 'text-emerald-400', time: '17:25', text: 'Subí un hilo con nuevos lineups en la pestaña de Comunidad por si les sirve!' }
+                ],
+                lol: [
+                    { id: 1, user: 'FakerFanboy', badge: 'Miembro', color: 'text-blue-400', time: '16:10', text: 'Busco Duo Jungla en Platino/Esmeralda para subir esta noche.' }
+                ],
+                streamers: [
+                    { id: 1, user: 'StreamCoach', badge: 'PRO', color: 'text-amber-400', time: '15:00', text: 'Consejo del día: Configurar una tasa de bits constante en OBS evita caídas de cuadros inesperadas.' }
+                ],
+                memes: [
+                    { id: 1, user: 'MemeLord', badge: 'Fun', color: 'text-yellow-400', time: '14:30', text: 'Cuando gastas la ulti de Jett en una caja vacía: 🤡' }
+                ]
+            },
+            events: [
+                {
+                    id: 1,
+                    title: 'Copa Streamers Valorant 5v5 - Split Spring',
+                    game: 'Valorant',
+                    status: 'live',
+                    date: 'En Directo Ahora',
+                    prize: '$1,500 USD',
+                    participants: '16 / 16 Equipos',
+                    description: 'Cuartos de final en curso. Transmisión comunitaria con drops de tarjetas de regalo.',
+                    registered: true
+                },
+                {
+                    id: 2,
+                    title: 'Speedrun Minecraft Master: Carrera Netherite',
+                    game: 'Minecraft',
+                    status: 'upcoming',
+                    date: 'Sábado, 20:00 CET',
+                    prize: '$500 USD + Rango Especial',
+                    participants: '42 / 64 Jugadores',
+                    description: 'Carrera individual con cronómetro en directo. Semilla aleatoria 1.20.4.',
+                    registered: false
+                },
+                {
+                    id: 3,
+                    title: 'Desafío ARAM Leyendas StreamersHub',
+                    game: 'League of Legends',
+                    status: 'upcoming',
+                    date: 'Domingo, 19:00 CET',
+                    prize: '10,000 Riot Points',
+                    participants: '20 / 32 Jugadores',
+                    description: 'Torneo casual y divertido en el Abismo de los Lamentos con builds aleatorias.',
+                    registered: false
+                },
+                {
+                    id: 4,
+                    title: 'Defensa Galáctica: Helldivers Night 9-Star',
+                    game: 'Helldivers 2',
+                    status: 'upcoming',
+                    date: 'Próximo Martes, 21:00 CET',
+                    prize: 'Pase de Batalla + Medallas',
+                    participants: '12 / 16 Escuadrones',
+                    description: 'Reto comunitario de extracción a máxima dificultad sin bajas de refuerzos.',
+                    registered: false
+                }
+            ],
+            clips: [
+                {
+                    id: 1,
+                    title: '1v4 Clutch con Sherif en Eco Round Imposible',
+                    streamer: 'AlexProGamer',
+                    game: 'Valorant',
+                    views: '18.4k',
+                    likes: 312,
+                    liked: false,
+                    duration: '0:28',
+                    thumbnailGrad: 'from-rose-900 to-indigo-900'
+                },
+                {
+                    id: 2,
+                    title: 'Momento exacto del susto con Warden en la Deep Dark',
+                    streamer: 'KitsuneChan',
+                    game: 'Minecraft',
+                    views: '24.9k',
+                    likes: 540,
+                    liked: false,
+                    duration: '0:35',
+                    thumbnailGrad: 'from-emerald-950 to-teal-900'
+                },
+                {
+                    id: 3,
+                    title: 'Robo de Barón Nashor con el cohete de Jinx a ciegas',
+                    streamer: 'NexuzGamer',
+                    game: 'League of Legends',
+                    views: '12.1k',
+                    likes: 198,
+                    liked: false,
+                    duration: '0:22',
+                    thumbnailGrad: 'from-blue-950 to-purple-900'
+                },
+                {
+                    id: 4,
+                    title: 'Salvados en el último segundo por una bomba de 500kg',
+                    streamer: 'SuperEarthTrooper',
+                    game: 'Helldivers 2',
+                    views: '9.8k',
+                    likes: 145,
+                    liked: false,
+                    duration: '0:30',
+                    thumbnailGrad: 'from-amber-950 to-red-900'
+                }
+            ],
+            activeModalClip: null
+        };
+
+        // Navigation Tab Switching
+        function switchTab(tabName) {
+            state.activeTab = tabName;
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            // Update Navigation Buttons UI
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-discord-hover transition-all duration-200";
+            });
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-twitch-600 text-white shadow-md";
+            }
+
+            if (tabName === 'channels') {
+                renderChatMessages();
+            } else if (tabName === 'events') {
+                renderEvents();
+            } else if (tabName === 'clips') {
+                renderClips();
+            }
+        }
+
+        // Mobile Menu Drawer Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Render Community Posts
+        function renderPosts(filteredPosts = null) {
+            const container = document.getElementById('posts-container');
+            if (!container) return;
+            const postsToRender = filteredPosts || state.posts;
+
+            if (postsToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-discord-sidebar/50 rounded-2xl border border-gray-800">
+                        <i class="fa-solid fa-folder-open text-4xl text-gray-500 mb-3"></i>
+                        <p class="text-gray-300 font-bold">No se encontraron hilos con este criterio</p>
+                        <p class="text-xs text-gray-500 mt-1">Sé el primero en iniciar un debate haciendo clic en 'Nuevo Hilo'.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = postsToRender.map(post => `
+                <article class="bg-discord-sidebar/90 border border-gray-800 hover:border-gray-700/80 rounded-2xl p-5 shadow-sm transition hover:shadow-md">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl ${post.avatarBg} text-white flex items-center justify-center font-bold text-sm shadow">
+                                ${post.avatarLetter}
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-sm text-gray-100">${post.author}</span>
+                                    <span class="text-xs bg-twitch-500/20 text-twitch-400 px-2 py-0.5 rounded-full font-medium">${post.game}</span>
+                                </div>
+                                <span class="text-xs text-gray-400">${post.time}</span>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-200 text-sm p-1"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                    <div class="mt-3.5">
+                        <h3 class="text-base font-bold text-white mb-1.5 hover:text-purple-300 transition cursor-pointer">${post.title}</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">${post.content}</p>
+                    </div>
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-1.5 mt-3">
+                        ${post.tags.map(t => `<span class="text-[11px] text-gray-400 bg-discord-darker px-2.5 py-1 rounded-md border border-gray-800">#${t}</span>`).join('')}
+                    </div>
+                    <!-- Footer Actions -->
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-800/80 text-xs text-gray-400">
+                        <div class="flex items-center space-x-4">
+                            <button onclick="togglePostLike(${post.id})" class="flex items-center space-x-1.5 ${post.liked ? 'text-rose-400 font-bold' : 'hover:text-rose-400'} transition">
+                                <i class="${post.liked ? 'fa-solid text-rose-500' : 'fa-regular'} fa-heart"></i>
+                                <span>${post.likes}</span>
+                            </button>
+                            <button onclick="addQuickReply(${post.id})" class="flex items-center space-x-1.5 hover:text-twitch-400 transition">
+                                <i class="fa-regular fa-comment"></i>
+                                <span>${post.replies} respuestas</span>
+                            </button>
+                            <button onclick="sharePost(${post.id})" class="hover:text-white transition">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
+                        </div>
+                        <span class="text-[11px] text-emerald-400 font-medium flex items-center">
+                            <i class="fa-solid fa-circle-check text-[10px] mr-1"></i> Verificado por StreamersHub
+                        </span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Like Post
+        function togglePostLike(id) {
+            const p = state.posts.find(item => item.id === id);
+            if (p) {
+                p.liked = !p.liked;
+                p.likes += p.liked ? 1 : -1;
+                filterPosts();
+            }
+        }
+
+        function addQuickReply(id) {
+            const p = state.posts.find(item => item.id === id);
+            if (p) {
+                p.replies += 1;
+                filterPosts();
+                alert(`¡Has respondido al hilo "${p.title}"!`);
+            }
+        }
+
+        function sharePost(id) {
+            const p = state.posts.find(item => item.id === id);
+            if (p) {
+                navigator.clipboard?.writeText(window.location.href);
+                alert(`Enlace copiado al portapapeles para: "${p.title}"`);
+            }
+        }
+
+        // Filter Catalog
+        function filterCatalog(game) {
+            state.activeCatalog = game;
+            document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
+                btn.className = "catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-discord-hover transition";
+            });
+            const key = game === 'League of Legends' ? 'lol' : game.toLowerCase();
+            const activeBtn = document.getElementById(`catalog-btn-${key}`);
+            if (activeBtn) {
+                activeBtn.className = "catalog-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium bg-twitch-600/20 text-twitch-400 border border-twitch-500/30 transition";
+            }
+            filterPosts();
+        }
+
+        // Search & Filter Posts
+        function filterPosts() {
+            const query = (document.getElementById('search-posts')?.value || '').toLowerCase().trim();
+            const filtered = state.posts.filter(p => {
+                const matchesCatalog = (state.activeCatalog === 'all') || (p.game.toLowerCase() === state.activeCatalog.toLowerCase());
+                const matchesSearch = !query || p.title.toLowerCase().includes(query) || p.content.toLowerCase().includes(query) || p.tags.some(t => t.toLowerCase().includes(query));
+                return matchesCatalog && matchesSearch;
+            });
+            renderPosts(filtered);
+        }
+
+        // Modals Management
+        function openNewPostModal() {
+            const modal = document.getElementById('new-post-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('post-title')?.focus(), 100);
+        }
+
+        function closeNewPostModal() {
+            const modal = document.getElementById('new-post-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleNewPostSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('post-title').value.trim();
+            const game = document.getElementById('post-game').value;
+            const content = document.getElementById('post-content').value.trim();
+            const tagsInput = document.getElementById('post-tags').value;
+            const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : ['comunidad'];
+
+            const newPost = {
+                id: Date.now(),
+                author: 'ValkyStream',
+                avatarLetter: 'V',
+                avatarBg: 'bg-twitch-600',
+                game: game,
+                title: title,
+                content: content,
+                tags: tags,
+                likes: 1,
+                liked: true,
+                replies: 0,
+                time: 'Hace un instante'
+            };
+
+            state.posts.unshift(newPost);
+            closeNewPostModal();
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-content').value = '';
+            document.getElementById('post-tags').value = '';
+            filterPosts();
+        }
+
+        // Chat Channels Functionality
+        const channelDetails = {
+            general: { title: 'Chat General de la Comunidad', desc: 'Habla de cualquier videojuego con la comunidad', ph: 'Enviar mensaje a #general-comunidad...' },
+            valorant: { title: 'Estrategias y Clips de Valorant', desc: 'Composiciones, agentes y debriefs de partidas', ph: 'Enviar mensaje a #valorant-tactics...' },
+            lol: { title: 'Grieta del Invocador - LoL', desc: 'Búsqueda de Duo, parches y teoría del meta', ph: 'Enviar mensaje a #lol-duos...' },
+            streamers: { title: 'Consejos para Creadores & Setup', desc: 'Audio, OBS, iluminación y crecimiento en plataformas', ph: 'Enviar mensaje a #tips-streamers...' },
+            memes: { title: 'Memes & Anécdotas de Directo', desc: 'Humor gamer y clips divertidos sin spoilers', ph: 'Enviar mensaje a #memes-gaming...' }
+        };
+
+        function switchChatChannel(chName, chTitle) {
+            state.activeChannel = chName;
+            document.getElementById('current-chat-title').innerText = channelDetails[chName]?.title || chTitle;
+            document.getElementById('current-chat-desc').innerText = channelDetails[chName]?.desc || '';
+            document.getElementById('chat-input').placeholder = channelDetails[chName]?.ph || 'Enviar mensaje...';
+
+            document.querySelectorAll('.chat-channel-btn').forEach(btn => {
+                btn.className = "chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-discord-hover hover:text-white flex items-center space-x-3 transition";
+            });
+            const activeBtn = document.getElementById(`channel-btn-${chName}`);
+            if (activeBtn) {
+                activeBtn.className = "chat-channel-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium bg-discord-hover text-white flex items-center space-x-3 transition";
+            }
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages');
+            if (!container) return;
+            const messages = state.chatMessages[state.activeChannel] || [];
+
+            container.innerHTML = messages.map(msg => `
+                <div class="flex items-start space-x-3 group hover:bg-discord-hover/30 p-2 rounded-xl transition">
+                    <div class="w-9 h-9 rounded-full bg-discord-sidebar border border-gray-700 flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-sm">
+                        ${msg.user.charAt(0)}
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-xs ${msg.color || 'text-white'}">${msg.user}</span>
+                            <span class="text-[10px] bg-discord-darker border border-gray-800 text-gray-400 px-1.5 py-0.2 rounded font-medium">${msg.badge}</span>
+                            <span class="text-[10px] text-gray-500">${msg.time}</span>
+                        </div>
+                        <p class="text-sm text-gray-200 mt-1 leading-snug break-words">${msg.text}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            if (!state.chatMessages[state.activeChannel]) {
+                state.chatMessages[state.activeChannel] = [];
+            }
+
+            state.chatMessages[state.activeChannel].push({
+                id: Date.now(),
+                user: 'ValkyStream',
+                badge: 'Streamer',
+                color: 'text-twitch-400',
+                time: timeStr,
+                text: text
+            });
+
+            input.value = '';
+            renderChatMessages();
+
+            // Auto simulated bot response after a brief delay
+            if (state.chatMessages[state.activeChannel].length % 2 === 0) {
+                setTimeout(() => {
+                    state.chatMessages[state.activeChannel].push({
+                        id: Date.now() + 1,
+                        user: 'AlexProGamer',
+                        badge: 'Streamer',
+                        color: 'text-indigo-400',
+                        time: timeStr,
+                        text: '¡Totalmente de acuerdo! GG por compartirlo.'
+                    });
+                    renderChatMessages();
+                }, 800);
+            }
+        }
+
+        function insertEmoji(emoji) {
+            const input = document.getElementById('chat-input');
+            input.value += emoji + ' ';
+            input.focus();
+        }
+
+        function toggleVoiceConnection() {
+            state.voiceConnected = !state.voiceConnected;
+            const btn = document.getElementById('voice-toggle-btn');
+            const title = document.getElementById('voice-status-title');
+            const count = document.getElementById('voice-members-count');
+
+            if (state.voiceConnected) {
+                btn.className = "bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-xs px-2.5 py-1.5 rounded-lg font-semibold transition";
+                btn.innerText = "Desconectar";
+                title.innerText = "Sala de Voz Activa";
+                count.innerText = "4 miembros conectados";
+            } else {
+                btn.className = "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-semibold transition";
+                btn.innerText = "Conectar";
+                title.innerText = "Voz Desconectada";
+                count.innerText = "Haz clic para unirte";
+            }
+        }
+
+        // Events & Tournaments Section
+        function filterEvents(type) {
+            document.querySelectorAll('.event-filter').forEach(btn => {
+                btn.className = "event-filter px-3.5 py-1.5 rounded-lg text-xs font-bold bg-discord-sidebar hover:bg-discord-hover text-gray-300";
+            });
+            const active = document.getElementById(`event-filter-${type}`);
+            if (active) {
+                active.className = "event-filter px-3.5 py-1.5 rounded-lg text-xs font-bold bg-twitch-600 text-white";
+            }
+
+            renderEvents(type);
+        }
+
+        function renderEvents(filter = 'all') {
+            const container = document.getElementById('events-container');
+            if (!container) return;
+
+            const filtered = state.events.filter(ev => {
+                if (filter === 'all') return true;
+                return ev.status === filter;
+            });
+
+            container.innerHTML = filtered.map(ev => `
+                <div class="bg-discord-sidebar/90 border border-gray-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-gray-700 transition shadow-lg">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full ${ev.status === 'live' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center' : 'bg-twitch-500/20 text-twitch-400'}">
+                                ${ev.status === 'live' ? '<span class="w-2 h-2 rounded-full bg-rose-500 inline-block mr-1.5 animate-pulse"></span>' : ''}
+                                ${ev.date}
+                            </span>
+                            <span class="text-xs text-gray-400 font-bold bg-discord-darker px-2.5 py-1 rounded-md border border-gray-800">${ev.game}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-2 leading-tight">${ev.title}</h3>
+                        <p class="text-xs text-gray-300 mb-4 leading-relaxed">${ev.description}</p>
+
+                        <div class="space-y-2 bg-discord-darker p-3 rounded-xl border border-gray-800/80 mb-4 text-xs">
+                            <div class="flex justify-between text-gray-300">
+                                <span class="text-gray-400"><i class="fa-solid fa-trophy mr-1 text-amber-400"></i> Premio:</span>
+                                <span class="font-bold text-amber-400">${ev.prize}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300">
+                                <span class="text-gray-400"><i class="fa-solid fa-users mr-1 text-blue-400"></i> Inscritos:</span>
+                                <span class="font-bold">${ev.participants}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-discord-dark border-t border-gray-800/80">
+                        <button onclick="toggleRegisterEvent(${ev.id})" class="w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 ${ev.registered ? 'bg-discord-hover text-emerald-400 border border-emerald-500/30' : 'bg-gradient-to-r from-twitch-600 to-discord-accent text-white shadow-md'}">
+                            <i class="${ev.registered ? 'fa-solid fa-check' : 'fa-solid fa-gamepad'}"></i>
+                            <span>${ev.registered ? 'Registrado - Ver Cuadro' : 'Inscribir Escuadrón'}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleRegisterEvent(id) {
+            const ev = state.events.find(e => e.id === id);
+            if (ev) {
+                ev.registered = !ev.registered;
+                renderEvents();
+                if (ev.registered) {
+                    alert(`¡Inscripción exitosa para "${ev.title}"! Revisa tu canal de Discord para las alertas de horario.`);
+                }
+            }
+        }
+
+        // Featured Clips Section
+        function renderClips() {
+            const container = document.getElementById('clips-container');
+            if (!container) return;
+
+            container.innerHTML = state.clips.map(clip => `
+                <div class="bg-discord-sidebar/90 border border-gray-800 hover:border-gray-700/80 rounded-2xl overflow-hidden shadow-lg transition flex flex-col justify-between group">
+                    <div class="relative aspect-video bg-gradient-to-br ${clip.thumbnailGrad} flex items-center justify-center cursor-pointer overflow-hidden" onclick="openClipPlayerModal(${clip.id})">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition"></div>
+                        <div class="w-12 h-12 rounded-full bg-twitch-600/90 text-white flex items-center justify-center text-lg shadow-lg group-hover:scale-110 transition z-10">
+                            <i class="fa-solid fa-play ml-0.5"></i>
+                        </div>
+                        <span class="absolute bottom-2.5 right-2.5 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-md z-10">${clip.duration}</span>
+                        <span class="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-sm text-purple-300 text-[10px] font-semibold px-2 py-0.5 rounded-md z-10">${clip.game}</span>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-white hover:text-purple-300 transition cursor-pointer leading-tight mb-2" onclick="openClipPlayerModal(${clip.id})">${clip.title}</h4>
+                            <p class="text-xs text-gray-400 flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-twitch-500 inline-block mr-1.5"></span>
+                                por <span class="font-bold text-gray-300 ml-1">${clip.streamer}</span>
+                            </p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 mt-3 border-t border-gray-800/80 text-xs text-gray-400">
+                            <span class="flex items-center"><i class="fa-solid fa-eye mr-1 text-gray-500"></i> ${clip.views}</span>
+                            <button onclick="toggleClipLike(${clip.id})" class="flex items-center space-x-1 ${clip.liked ? 'text-rose-400 font-bold' : 'hover:text-rose-400'} transition">
+                                <i class="${clip.liked ? 'fa-solid text-rose-500' : 'fa-regular'} fa-heart"></i>
+                                <span>${clip.likes}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleClipLike(id) {
+            const clip = state.clips.find(c => c.id === id);
+            if (clip) {
+                clip.liked = !clip.liked;
+                clip.likes += clip.liked ? 1 : -1;
+                renderClips();
+            }
+        }
+
+        function openClipPlayerModal(id) {
+            const clip = state.clips.find(c => c.id === id);
+            if (!clip) return;
+            state.activeModalClip = clip;
+
+            document.getElementById('modal-clip-title').innerText = clip.title;
+            document.getElementById('modal-clip-author').innerText = `Transmitido por ${clip.streamer}`;
+            document.getElementById('modal-clip-avatar').innerText = clip.streamer.charAt(0);
+            document.getElementById('modal-clip-views').innerText = clip.views;
+            document.getElementById('modal-clip-game').innerText = clip.game;
+            document.getElementById('modal-clip-likes-text').innerText = `Me gusta (${clip.likes})`;
+
+            const likeBtn = document.getElementById('modal-clip-like-btn');
+            if (clip.liked) {
+                likeBtn.className = "bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 transition";
+            } else {
+                likeBtn.className = "bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center space-x-1.5 transition";
+            }
+
+            const modal = document.getElementById('clip-player-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeClipPlayerModal() {
+            const modal = document.getElementById('clip-player-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            state.activeModalClip = null;
+        }
+
+        function toggleClipPlayAnimation() {
+            const icon = document.getElementById('modal-play-icon');
+            if (icon.classList.contains('fa-play')) {
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+                document.getElementById('modal-clip-subtitle').innerText = "Reproduciendo clip con audio de alta fidelidad...";
+            } else {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+                document.getElementById('modal-clip-subtitle').innerText = "Clip en pausa. Haz clic para reanudar.";
+            }
+        }
+
+        function likeCurrentModalClip() {
+            if (state.activeModalClip) {
+                toggleClipLike(state.activeModalClip.id);
+                openClipPlayerModal(state.activeModalClip.id);
+            }
+        }
+
+        function openShareClipModal() {
+            const title = prompt("Introduce el enlace de Twitch o título de tu clip para compartirlo:");
+            if (title) {
+                state.clips.unshift({
+                    id: Date.now(),
+                    title: title,
+                    streamer: 'ValkyStream',
+                    game: 'Valorant',
+                    views: '1',
+                    likes: 1,
+                    liked: true,
+                    duration: '0:30',
+                    thumbnailGrad: 'from-purple-900 to-indigo-900'
+                });
+                renderClips();
+                alert("¡Clip subido con éxito y publicado en la sección destacada!");
+            }
+        }
+
+        // Initialize application on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPosts();
+            renderChatMessages();
+            renderEvents();
+            renderClips();
+        });
+    </script>
+</body>
+</html>
